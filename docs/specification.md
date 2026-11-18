@@ -169,7 +169,13 @@ Le schéma d'architecture complet avec les flux de composants et le diagramme Me
 
 <!-- Section 11 : Attribuée à Youssef EL HAJJI (Ticket #25 - Branche feature/spec-qualite-youssef-elhajji) -->
 
-*Respect des contraintes opérationnelles (outils gratuits, persistance brute, autonomie hors-ligne, données incomplètes).*
+| Contrainte | Comment l'architecture la respecte |
+|---|---|
+| **Outils gratuits uniquement** | L'ensemble de la chaîne de traitement repose exclusivement sur des technologies open source gratuites et sans licence payante : Python 3.11 pour les scripts, DuckDB pour l'entrepôt décisionnel analytique, Pandas pour les transformations tabulaires, Pytest pour l'automatisation des barrières de qualité, et Git/GitHub pour le versionnement collaboratif. |
+| **Conserver les données brutes** | Tous les fichiers sources récupérés (archives Météo-France `.csv.gz`, exports BDIFF, découpages IGN) sont déposés sans aucune altération dans le dossier `data/raw/`. Ce répertoire est exclu du suivi Git via le `.gitignore` afin de préserver la légèreté du dépôt tout en garantissant un historique immuable des données reçues. |
+| **Pouvoir retraiter sans rappeler les API** | L'architecture applique un découplage total entre la phase d'ingestion et les phases de transformation : les données sont téléchargées une seule fois en local. L'ensemble des pipelines de nettoyage, de contrôle qualité et de consolidation s'exécute de manière 100 % reproductible et hors-ligne à partir des fichiers stockés dans `data/raw/`. |
+| **Données incomplètes** | Face aux manques documentés (notamment les 70 % de causes non renseignées dans la BDIFF ou l'absence de capteur de vent à Belin-Béliet), le pipeline n'invente aucune valeur : utilisation de valeurs sentinelles explicites (`"Inconnue"`), substitution par une station homologuée voisine (Cazats à 25 km), et consignation formelle des limites dans le journal des décisions (DEC-001 à DEC-006). |
+| **Accès à une source limité ou interrompu** | En cas de défaillance, de modification d'URL ou de quotas stricts sur les portails data.gouv.fr ou Météo-France, l'équipe travaille sur l'instantané local persisté dans `data/raw/`. Pour les capteurs météo, le modèle intègre une table de correspondance géographique permettant de basculer automatiquement sur la deuxième station la plus proche en Gironde en cas de panne matérielle prolongée. |
 
 ---
 
