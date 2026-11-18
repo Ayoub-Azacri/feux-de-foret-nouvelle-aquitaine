@@ -125,4 +125,20 @@ Chaque terme employé dans ce document de spécification (BDIFF, DFCI, Dispositi
 
 <!-- Section 14 : Attribuée à Ayoub AZACRI (Ticket #23 - Branche feature/spec-cadrage-ayoub) -->
 
-*Limites de la spécification, ce qu'elle ne permet pas de dire, et synthèse des décisions d'arbitrage.*
+Ce que cette spécification ne permettra pas de dire au commanditaire, et pourquoi :
+1. Elle ne permettra pas de calculer un bilan financier réel à l'euro près des économies réalisées, en raison de l'absence de données comptables publiques sur la masse salariale et les coûts de fonctionnement du SDIS 33 (remplacé par un estimateur paramétrique forfaitaire, renvoi DEC-006).
+2. Elle ne permettra pas de modéliser la vitesse de propagation fine minute par minute des fronts de flammes en hectares par heure, car la BDIFF consigne l'heure du premier appel mais pas l'heure de maîtrise ni d'extinction du sinistre (renvoi DEC-005).
+3. Elle ne pourra pas prédire avec certitude les départs de feux d'origine humaine accidentelle (mégots, débroussaillage) survenus lors de journées à très faible indice de danger météorologique, le risque étant comportemental et non climatique.
+
+### Synthèse du Journal des décisions
+
+Lien vers le journal complet des arbitrages : `docs/journal-des-decisions.md`
+
+| ID | Date | Auteur | Question | Nature | Motivation opérationnelle | Coût analytique et biais assumé |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **DEC-001** | 17/11/2026 | Ayoub AZACRI | Q1 | Approximer | Absence de coordonnées GPS précises dans le CSV brut BDIFF | Agrégation au niveau de la commune Insee, masquant les disparités locales internes |
+| **DEC-002** | 17/11/2026 | Omar HAKIK | Q2 | Approximer | Absence d'archives Météo des forêts pour la canicule historique de 2022 | Reconstitution par un proxy physique météo (T > 35°C, vent > 30 km/h, U < 30%) |
+| **DEC-003** | 17/11/2026 | Youssef DEKHAIL | Q3 | Approximer | Absence d'anémomètre et d'hygromètre sur la station forestière de Belin-Béliet | Substitution par les données de la station voisine de Cazats (à 25 km) |
+| **DEC-004** | 17/11/2026 | Youssef EL HAJJI | Q4 | Approximer | Grain départemental uniforme de la vigilance masquant les micro-climats | Croisement avec les stations terrestres locales pour isoler les anomalies thermiques |
+| **DEC-005** | 18/11/2026 | Ayoub AZACRI | Q5 | Renoncer | Heure d'extinction du feu absente de la BDIFF (cinétique ha/h impossible) | Renoncement à la vitesse d'expansion au profit de la surface moyenne finale détruite |
+| **DEC-006** | 18/11/2026 | Ayoub AZACRI | Q6 | Approximer | Absence des données de comptabilité analytique interne du SDIS 33 | Paramétrage d'un coût forfaitaire indicatif renseigné par le commanditaire |
