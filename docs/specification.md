@@ -75,7 +75,24 @@ Questions écartées, avec la raison et le renvoi au journal :
 
 <!-- Section 8 : Attribuée à Youssef DEKHAIL (Ticket #26 - Branche feature/spec-pipeline-youssef-dekhail) -->
 
-*Gestion de la dérive temporelle, millésimes de la végétation et partitionnement des séries météo.*
+La gestion de la dérive temporelle, des millésimes de référence et des séries chronologiques hétérogènes constitue un enjeu central pour la fiabilité du pipeline décisionnel du SDIS 33.
+
+### 8.1. BD Forêt V2 : figeage du millésime de référence et correction post-incendies
+* **Millésime de référence fové :** Les données vectorielles de la BD Forêt V2 pour la Gironde reposent sur la campagne de photographies aériennes de 2012-2015 publiées en 2017. L'entrepôt fige cette source comme référentiel spatial historique de base (`millesime = 2017`).
+* **Correction des communes sinistrées en 2022 :** Cette couverture ignorant les destructions des méga-feux de juillet et août 2022 (Landiras et La Teste-de-Buch, plus de 30 000 hectares brûlés) et de l'été 2026, le pipeline applique une recalibration d'éclosion. Les surfaces forestières réellement actives sont corrigées au niveau communal en soustrayant les surfaces calcinées consolidées dans la BDIFF, évitant de surévaluer le combustible disponible dans les zones déjà brûlées ou en coupe sanitaire.
+
+### 8.2. Météo des forêts : partitionnement annuel et estival
+* **Période de diffusion :** L'indice officiel de la Météo des forêts est publié exclusivement lors de la campagne estivale (du 1er juin au 30 septembre) depuis l'été 2024.
+* **Règle de partitionnement :** Les tables de faits de vigilance sont partitionnées par année et par campagne estivale (`annee`, `mois`). Chaque campagne annuelle constitue un jeu de données autonome et immuable.
+* **Traitement de la rupture 2022 :** En l'absence d'historique officiel pour la saison de crise 2022, un seuil proxy physique est simulé via les stations météo horaires (température > 35 °C, vent moyen > 30 km/h, humidité relative < 30%) conformément à la décision DEC-002, tracé sous le statut `source = 'proxy_physique_reconstitue'`.
+
+### 8.3. Stations horaires : figeage de l'archive et append des flux récents
+* **Figeage de l'archive décennale :** Le fichier d'archive 2020-2024 (`H_33_previous-2020-2024.csv.gz`) est figé en zone de données nettoyées comme socle d'apprentissage et de calibrage historique.
+* **Alimentation incrémentale (Append-Only) :** Les relevés récents des saisons 2025 et 2026 sont intégrés par chargement incrémental régulier (mode append) sans réécrire l'historique consolidé, garantissant des temps de traitement optimaux.
+
+### 8.4. Découpage administratif Insee et gestion des fusions communales
+* **Rattachement au COG d'origine :** Les feux de la BDIFF sont rattachés au Code Officiel Géographique (COG) en vigueur lors de l'année du sinistre.
+* **Alignement décisionnel 2027 :** Pour la restitution opérationnelle destinée aux officiers du SDIS 33, une table de passage Insee projette l'ensemble des historiques sur la nomenclature communale active au 1er janvier 2027 (gestion de type SCD 1 sur la dimension communale pour refléter les fusions récentes sans fausser les décomptes passés).
 
 ---
 
@@ -91,7 +108,20 @@ Questions écartées, avec la raison et le renvoi au journal :
 
 <!-- Section 10 : Attribuée à Youssef DEKHAIL (Ticket #26 - Branche feature/spec-pipeline-youssef-dekhail) -->
 
-*Tableau des 6 couches du pipeline et schéma d'architecture Mermaid dans docs/architecture.md.*
+Le pipeline décisionnel s'articule autour de 6 couches logiques normalisées, garantissant la traçabilité des transformations et la conformité aux exigences de l'enseignante.
+
+Le schéma d'architecture complet avec les flux de composants et le diagramme Mermaid est documenté dans le fichier compagnon [`docs/architecture.md`](architecture.md).
+
+### Tableau des 6 couches du pipeline
+
+| N° | Couche | Format et stockage | Responsabilité technique | Questions servies (Q1 à Q6) |
+| :--- | :--- | :--- | :--- | :--- |
+| **1** | **Sources** | Portails data.gouv.fr et Géoplateforme IGN (CSV, CSV.GZ, WFS) | Flux bruts CSV, .csv.gz, GeoJSON interrogés par requêtes HTTP ou scripts d'ingestion depuis les producteurs officiels (IGN, Météo-France, Ministère de l'Agriculture). | Socle d'autorité pour l'ensemble des questions Q1 à Q6. |
+| **2** | **Données brutes (Raw)** | Répertoire local `data/raw/` (fichiers natifs immuables non versionnés) | Stockage immuable dans `data/raw/` avec horodatage de collecte, garantissant la persistance brute et la reproductibilité hors-ligne sans dépendance réseau. | Traçabilité intégrale pour l'auditabilité RNCP. |
+| **3** | **Données nettoyées (Clean)** | Vues ou tables DuckDB / fichiers Parquet typés | Standardisation UTC, typage rigoureux, formatage des codes Insee, projection stricte sur 8 colonnes météo (minimisation) et validation par la barrière de qualité Pytest. | Q2 (fiabilité des seuils sans valeurs erronées), Q4 (anomalies météo vérifiées), Q6 (créneaux horaires propres). |
+| **4** | **Données consolidées (Warehouse)** | Modèle dimensionnel en étoile sous moteur DuckDB (`feux_foret.duckdb`) | Jointure spatio-temporelle Insee x Station x Feux sous DuckDB reliant les tables de dimensions (`dim_commune`, `dim_station_meteo`) et de faits (`fait_incendie`, `fait_vigilance_mdf`, `fait_releve_horaire`). | Q1 (concentration massifs), Q3 (modulation spatiale), Q5 (benchmark départemental de surface brûlée). |
+| **5** | **Données prêtes pour l'analyse (Analytics)** | Vues SQL et tables dérivées d'agrégation | Tables agrégées pour matrices de confusion (taux de fausses alertes et de non-détections), indicateurs de sinistralité par massif et par mois, et profils horaires d'éclosion. | Q2 (matrice de confusion officielle), Q3 (seuils optimaux par secteur DFCI), Q4 (anomalies sous vigilance Vert/Jaune), Q5 (surface moyenne détruite). |
+| **6** | **Restitution** | Interface interactive (Streamlit / tableaux de bord décisionnels) | Visualisations interactives Streamlit pour le SDIS 33 restituant la grille de déclenchement 2027, la cartographie des massifs prioritaires et le planning des astreintes. | Support direct aux deux décisions stratégiques de la direction du SDIS 33. |
 
 ---
 
@@ -107,7 +137,22 @@ Questions écartées, avec la raison et le renvoi au journal :
 
 <!-- Section 12 : Attribuée à Youssef DEKHAIL (Ticket #26 - Branche feature/spec-pipeline-youssef-dekhail) -->
 
-*Jalons de livraison du pipeline et hypothèses techniques avant la soutenance.*
+Le déploiement du pipeline décisionnel respecte un séquencement itératif rigoureux en 5 jalons successifs. Conformément aux consignes de cours, chaque jalon est validé par une preuve technique tangible et vérifiable.
+
+### Séquencement chronologique et preuves de validation
+
+| Jalon | Intitulé de la phase | Contenu technique et livrables | Échéance | Preuve formelle vérifiable |
+| :--- | :--- | :--- | :--- | :--- |
+| **Jalon 1** | **Ingestion et persistance brute** | Scripts d'ingestion brute dans `data/raw/` (BDIFF, Météo des forêts, BD Forêt V2, Stations horaires) et figeage des extraits locaux. | 24 nov. 2026 | Fichiers bruts présents dans `data/raw/`, script d'ingestion exécutable sans erreur et PR fusionnée dans `dev`. |
+| **Jalon 2** | **Nettoyage et barrière de qualité** | Standardisation UTC, typage, projection colonnes et implémentation des règles de quality gate avec Pytest. | 27 nov. 2026 | Suite de tests automatisés Pytest passant avec succès (code retour 0) et tag Git officiel `clean-v1`. |
+| **Jalon 3** | **Consolidation spatio-temporelle DuckDB** | Modélisation en étoile (`dim_...` et `fait_...`), jointures spatio-temporelles Insee x Station x Feux sous DuckDB. | 01 déc. 2026 | Base de données locale `feux_foret.duckdb` générée via script SQL/CLI unique et tag Git `warehouse-v1`. |
+| **Jalon 4** | **Tables d'analyse et indicateurs de confusion** | Vues analytiques d'agrégation, calcul de la matrice de confusion 2024-2026, proxy météo 2022 et benchmark régional. | 04 déc. 2026 | Requêtes SQL analytiques de validation produisant les résultats chiffrés pour les 6 questions décisionnelles. |
+| **Jalon 5** | **Dashboard Streamlit et finalisation soutenance** | Application interactive Streamlit pour le SDIS 33, rapport final d'architecture et répétition de la soutenance. | 08 déc. 2026 | Démonstration opérationnelle du dashboard validée pour la soutenance du 11 décembre 2026 et tag final `release-v1` sur `main`. |
+
+### Hypothèses techniques d'ordonnancement
+1. **Autonomie locale hors-ligne :** Tous les scripts de traitement fonctionnent à partir des extraits bruts locaux persistés dans `data/raw/`, éliminant tout blocage lié aux limites de requêtes (rate limiting) ou à l'indisponibilité temporaire des API gouvernementales.
+2. **Technologie légère et standard :** Le choix de DuckDB et Python élimine le besoin d'infrastructure cloud payante ou de serveurs de bases de données lourds (PostgreSQL / Oracle). L'intégralité du pipeline peut être exécutée sur n'importe quel poste de travail standard en moins de 30 secondes.
+3. **Traçabilité Git continue :** Aucun commit direct n'est toléré sur `main` ni sur `dev`. Chaque évolution technique fait l'objet de la branche de rôle `feature/spec-pipeline-youssef-dekhail`, d'un commit par section (#26), d'une Pull Request relue par Youssef EL HAJJI et de tests automatisés validés avant fusion.
 
 ---
 
