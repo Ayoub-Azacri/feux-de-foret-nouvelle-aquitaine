@@ -16,7 +16,18 @@ Le Service Départemental d'Incendie et de Secours de la Gironde (SDIS 33) prép
 
 <!-- Section 2 : Attribuée à Ayoub AZACRI (Ticket #23 - Branche feature/spec-cadrage-ayoub) -->
 
-*Tableau des questions retenues et questions écartées (avec motif et renvoi au journal des décisions).*
+| N° | Question | Décision qu'elle éclaire | Proposée par |
+| :--- | :--- | :--- | :--- |
+| **Q1** | Concentration spatiale des éclosions et massifs vulnérables | Identifier les communes et massifs à fort risque pour cibler les patrouilles | Ayoub, Omar, Youssef EL H., Youssef D. |
+| **Q2** | Fiabilité du seuil Météo des forêts et matrice de confusion | Calibrer objectivement le niveau d'alerte pour réduire les fausses alertes | Ayoub, Omar, Youssef EL H., Youssef D. |
+| **Q3** | Modulation spatiale (massifs) et temporelle (mois) du seuil d'alerte | Différencier le déclenchement entre Landes de Gascogne, littoral et vignoble | Youssef D., Ayoub |
+| **Q4** | Départs de feu non anticipés sous vigilance faible ou modérée (Vert / Jaune) | Évaluer la vulnérabilité micro-climatique et adapter la posture de garde | Omar, Youssef EL H. |
+| **Q5** | Comparaison interdépartementale de la surface moyenne brûlée par feu | Benchmark régional face aux Landes (40) et à la zone Méditerranée | Ayoub, Omar, Youssef EL H., Youssef D. |
+| **Q6** | Ventilation horaire et hebdomadaire pour les astreintes pompiers | Dimensionner les vacations et les gardes postées en caserne par tranche de 2h | Ayoub |
+
+Questions écartées, avec la raison et le renvoi au journal :
+* Calcul de la cinétique horaire fine de propagation en hectares par heure (ha/h) : écartée car la BDIFF ne contient pas l'heure de maîtrise du feu (renvoi DEC-005).
+* Calcul du coût financier analytique direct en euros des gardes pompiers : écartée car les données comptables internes du SDIS 33 ne sont pas publiques ; remplacée par un paramètre forfaitaire indicatif (renvoi DEC-006).
 
 ---
 
