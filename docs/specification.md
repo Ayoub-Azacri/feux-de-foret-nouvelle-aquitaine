@@ -110,7 +110,37 @@ La gestion de la dérive temporelle, des millésimes de référence et des séri
 
 <!-- Section 9 : Attribuée à Youssef EL HAJJI (Ticket #25 - Branche feature/spec-qualite-youssef-elhajji) -->
 
-*Exigences par source, profilage réel de l'échantillon Gironde 2022 et 3 règles de test automatisées (quality gate).*
+Pour chaque source retenue, ce que vous exigez d'elle :
+
+| Source | Champs requis | Champs pouvant être vides (raison) | Clé et grain | Référentiel attendu | Période attendue |
+|---|---|---|---|---|---|
+| **BDIFF** | `id_incendie`, `date_premiere_alerte`, `heure_alerte`, `code_insee`, `surface_totale_brulee_ha`, `code_departement` | `nature_cause` (souvent indéterminée lors de l'intervention initiale), `surface_foret_ha` (si le feu s'est limité à des broussailles/champs) | Clé : `id_incendie`. Grain : un incendie instruit par commune. | Code officiel géographique (COG Insee). | 2006 à 2024 (focus annuel 2022 et 2026). |
+| **Météo des forêts** | `date`, `num_dep`, `niveau_j1`, `niveau_j2` | Aucun champ vide toléré sur la période estivale active (du 01/06 au 30/09). | Clé composite : `date` + `num_dep`. Grain : un jour par département. | Code département Insee (`33`). | Saisons estivales 2024 à 2026. |
+| **BD Forêt V2** | `code_tfv`, `essence`, `geom` | Précision sub-essence (si la formation végétale est mixte ou buissonnante). | Clé : identifiant polygone. Grain : un polygone végétal >= 0,5 ha. | Référentiel IGN Lambert-93. | Millésime figé 2017 (recalibré post-feux 2022). |
+| **Stations horaires** | `NUM_POSTE`, `AAAAMMJJHH`, `T`, `FF`, `U`, drapeaux qualité (`QT`, `QFF`, `QU`) | Colonnes spécialisées hors feux (`RR1` si temps sec, hauteur de neige, insolation). | Clé composite : `NUM_POSTE` + `AAAAMMJJHH`. Grain : un relevé horaire par station. | Réseau des 31 stations terrestres homologuées Météo-France. | 2020 à 2026 (continu en UTC). |
+
+Profil de chaque source : taux de remplissage des champs requis, entités présentes comparées au référentiel, bornes des dates. Chaque chiffre vient du fichier de votre région. Fichier ou requête qui l'a produit : 
+Audit statistique réalisé sous Python / DuckDB sur le fichier réel `data/raw/echantillon_bdiff_gironde_2022.csv` (10 feux d'échantillon sur la campagne de crise 2022 en Gironde) :
+* Taux de complétude sur `id_incendie` : 100 % (10/10).
+* Taux de complétude sur `date_premiere_alerte` et `heure_alerte` : 100 % (10/10).
+* Taux de complétude sur `code_insee` : 100 % (10/10, toutes les communes sont valides dans le COG Insee 33).
+* Taux de complétude sur `surface_totale_brulee_ha` : 100 % (10/10, valeurs positives allant de 0,05 ha à plus de 20 000 ha).
+* Taux de valeurs renseignées sur `nature_cause` : 30 % seulement (3/10 avec cause identifiée : 1 Accidentelle, 1 Malveillance, 1 Foudre naturelle), et 70 % de valeurs manquantes remplacées par la valeur sentinelle `"Inconnue"`.
+* Bornes temporelles observées : du 18 juin 2022 au 14 août 2022 (recouvrement intégral des épisodes majeurs de Landiras et La Teste-de-Buch).
+
+Règles de qualité (trois au minimum, sur deux niveaux de complétude et une autre dimension) :
+
+| N° | Source | Niveau ou dimension | Sélecteur | Prédicat | Seuil (et sa justification) | Décision (bloquer, alerter, tolérer) |
+|---|---|---|---|---|---|---|
+| **R1** | BDIFF | Complétude valeur | Toutes les lignes de la table d'ingestion brute | `id_incendie IS NOT NULL AND date_premiere_alerte IS NOT NULL AND code_insee IS NOT NULL` | Seuil d'échec : 0 %. Un sinistre sans identifiant, sans date ou sans commune est inexploitable. | **Bloquer** (rejet de la ligne corrompue et journalisation de l'anomalie). |
+| **R2** | Météo des forêts | Complétude population | Mois estivaux actifs (du 1er juin au 30 septembre) pour le département 33 | `COUNT(DISTINCT date) == 122` (couverture intégrale des 122 jours d'été) | Seuil de jours manquants : 0 jour. Un trou de vigilance dans l'été fausse le calcul des matrices de confusion. | **Bloquer** (arrêt du pipeline d'ingestion et notification d'absence de données). |
+| **R3** | Stations horaires | Validité et plausibilité physique | Tous les relevés météo horaires enregistrés en Gironde | `T BETWEEN -15 AND 50 AND FF >= 0 AND U BETWEEN 0 AND 100` | Seuil d'aberration : 0 % d'erreurs tolérées en dehors des drapeaux de contrôle validés (`QT == 1`, `QFF == 1`). | **Bloquer** (mise en quarantaine des valeurs aberrantes de capteurs instrumentaux). |
+
+Ce que ces indicateurs de qualité ne permettent pas d'affirmer :
+Ces contrôles valident la cohérence structurelle et syntaxique des fichiers ingérés, mais ils ne permettent pas de garantir la vérité terrain absolue :
+1. Ils ne détectent pas les feux de végétation étouffés immédiatement par des riverains ou des propriétaires fonciers et qui n'ont fait l'objet d'aucun appel au 18/112 (non déclarés dans la BDIFF).
+2. Ils ne permettent pas de lever l'incertitude sur les 70 % d'incendies classés avec la cause "Inconnue".
+3. Une station météo dont les capteurs physiques sont techniquement valides (règle R3 respectée) peut être située à 20 kilomètres du foyer d'incendie et ne pas refléter un micro-climat local très sec ou une rafale convective générée par le feu lui-même.
 
 ---
 
