@@ -62,6 +62,21 @@ Dernière mise à jour : 2026-11-17
 * **Origine de la définition :** Code officiel géographique (Insee).
 * **Ajouté par :** Youssef EL HAJJI et Omar HAKIK, 2026-11-16.
 
+## DFCI (Défense des Forêts Contre les Incendies)
+
+* **Définition :** Organisation syndicale et réseau d'aménagement territorial spécifique au massif des Landes de Gascogne, gérant les pistes forestières, les points d'eau et les tours de guet pour faciliter l'accès et l'intervention des pompiers.
+* **Registre :** Dispositif d'aménagement foncier et association territoriale de propriétaires forestiers.
+* **Contexte d'usage :** Carroyage géographique des parcelles forestières, orientation des secours sur le réseau de pistes numérotées et surveillance des massifs.
+* **Synonymes et antonymes :** Synonyme : Réseau d'aménagement DFCI, carroyage DFCI. Antonyme : Forêt non aménagée, domaine public communal non boisé.
+* **Sources et colonnes :** E-mail SDIS 33 (« patrouilles, guet, etc. »), inventaire des pistes et points d'eau DFCI d'Aquitaine.
+* **Divergences :** Pour les pompiers, le carroyage DFCI est le référentiel spatial opérationnel pour localiser un feu en forêt. Pour la BDIFF, les feux sont rattachés au code Insee de la commune administrative.
+* **Règle retenue :** Utiliser le carroyage DFCI comme dimension spatiale d'agrégation des communes forestières pour regrouper les départs de feux par grand massif homogène.
+* **Unité ou granularité :** Secteur de surveillance ou massif DFCI.
+* **Exemple :** Carroyage DFCI du Sud-Médoc ou piste DFCI de Landiras.
+* **Statut :** validé.
+* **Origine de la définition :** Association régionale DFCI Aquitaine et Code forestier.
+* **Ajouté par :** Ayoub AZACRI et Youssef DEKHAIL, 2026-11-18.
+
 ## Dispositif renforcé
 
 * **Définition :** Posture opérationnelle préventive exceptionnelle ordonnée par la direction des secours, consistant à mobiliser des effectifs supplémentaires en caserne, à prépositionner des véhicules d'attaque en forêt et à armer les vigies lors des journées à fort risque d'incendie.
