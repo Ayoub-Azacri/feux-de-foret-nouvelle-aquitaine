@@ -8,7 +8,7 @@ Groupe : Ayoub AZACRI (Chef de projet), Omar HAKIK (Responsable sources), Yousse
 
 <!-- Section 1 : Attribuée à Ayoub AZACRI (Ticket #23 - Branche feature/spec-cadrage-ayoub) -->
 
-*Le commanditaire, la décision à éclairer et l'échéance, en trois phrases.*
+Le Service Départemental d'Incendie et de Secours de la Gironde (SDIS 33) prépare son dispositif opérationnel estival face au risque accru de feux de forêt pour la saison estivale 2027. La décision consiste à calibrer le dimensionnement préventif des gardes postées en caserne, l'ordonnancement des patrouilles de surveillance de massifs et le seuil de déclenchement du dispositif renforcé. Ce cadrage opérationnel doit être validé d'ici mai 2027 pour engager les arrêtés préfectoraux et la planification des astreintes des sapeurs-pompiers.
 
 ---
 
