@@ -67,7 +67,17 @@ Questions écartées, avec la raison et le renvoi au journal :
 
 <!-- Section 7 : Attribuée à Youssef EL HAJJI (Ticket #25 - Branche feature/spec-qualite-youssef-elhajji) -->
 
-*Analyse RGPD par champ, filtrage des textes libres et évaluation du risque de ré-identification.*
+| Champ | Source | Question qui le justifie | Décision (garder, pseudonymiser, écarter) | Technique |
+|---|---|---|---|---|
+| `id_incendie`, `date_heure_alerte`, `code_insee`, `surface_brulee_ha` | BDIFF | Q1, Q2, Q4, Q5, Q6 | Garder | Ingestion directe sans modification : données d'événements environnementaux et matériels sans caractère personnel. |
+| `nature_cause` | BDIFF | Q4 | Garder | Conservation uniquement sous forme de catégories agrégées (Foudre, Accidentelle, Malveillance, Inconnue) sans détail sur les auteurs ou suspects. |
+| `commentaires`, `textes_libres` (mains courantes) | BDIFF / SDIS | Aucune | Écarter | Suppression systématique dès la couche brute (`données nettoyées`) pour éviter toute fuite de noms d'appelants, numéros de téléphone ou adresses privées. |
+| `niveau_j1`, `niveau_j2`, `date`, `num_dep` | Météo des forêts | Q2, Q3, Q4, Q5 | Garder | Ingestion directe : indices administratifs publics de vigilance à l'échelle départementale. |
+| `NUM_POSTE`, `AAAAMMJJHH`, `T`, `FF`, `FXY`, `U` | Stations horaires | Q1, Q2, Q3, Q4 | Garder | Ingestion directe : mesures physiques instrumentales issues de capteurs automatisés, totalement anonymes. |
+| `code_tfv`, `essence`, `geom` | BD Forêt V2 | Q1, Q3 | Garder | Conservation agrégée à la commune (taux de pin) en écartant toute liaison avec le cadastre ou les propriétaires forestiers privés. |
+
+Risque de ré-identification par croisement : 
+Le risque de ré-identification d'une personne physique par croisement de nos sources est considéré comme nul. Les données ingérées sont exclusivement d'ordre physique, environnemental et matériel (température, vent, surface brûlée, essences d'arbres). Le grain de croisement le plus fin est la commune Insee (plusieurs milliers d'habitants et de vastes massifs forestiers) et le créneau horaire, ce qui rend impossible l'identification directe ou indirecte d'un individu ou d'un propriétaire forestier spécifique. Le pipeline respecte strictement le principe de minimisation (article 5 du RGPD) en écartant dès l'entrée tout champ textuel non structuré.
 
 ---
 
