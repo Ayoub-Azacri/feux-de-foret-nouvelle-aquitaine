@@ -115,7 +115,9 @@ Questions écartées, avec la raison et le renvoi au journal :
 
 <!-- Section 13 : Attribuée à Ayoub AZACRI (Ticket #23 - Branche feature/spec-cadrage-ayoub) -->
 
-*Lien vers docs/glossaire.md et synthèse des termes métier officiels SDIS 33.*
+Lien vers le glossaire complet : `docs/glossaire.md` · Nombre de termes : 13 termes officiels validés · Termes encore « à vérifier » : 0.
+
+Chaque terme employé dans ce document de spécification (BDIFF, DFCI, Dispositif renforcé, Éclosion, Fausse alerte, IFM, Météo des forêts, Millésime, Taux de feux non anticipés, WUI) dispose de sa fiche complète avec définition métier, registre, divergences repérées et règle d'arbitrage formalisée dans `docs/glossaire.md`.
 
 ---
 
