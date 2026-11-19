@@ -52,7 +52,14 @@ Sources écartées, avec la raison :
 
 <!-- Section 4 : Attribuée à Omar HAKIK (Ticket #24 - Branche feature/spec-sources-omar) -->
 
-*Tableau de la source d'autorité unique par domaine partagé (incendies, météo prévisionnelle, végétation, mesures physiques).*
+Pour chaque donnée présente dans plusieurs sources :
+
+| Donnée | Sources concernées | Source de référence | Pourquoi |
+| :--- | :--- | :--- | :--- |
+| **Historique des incendies et surfaces** | BDIFF, Rapports internes SDIS | **BDIFF** | Base d'État consolidée par les DDTM et le SDIS, opposable et exhaustif sur 2006-2025. |
+| **Seuil d'alerte préventif** | Météo des forêts, Météo générale | **Archives Météo des forêts** | Seul indicateur officiel servant de déclencheur juridique aux arrêtés préfectoraux de restriction. |
+| **Combustible et couvert résineux** | BD Forêt V2, Corine Land Cover | **BD Forêt V2 (IGN)** | Référentiel national français le plus précis pour caractériser le pin maritime (résolution 0,5 ha). |
+| **Mesures physiques (vent, T°C, humidité)** | Stations horaires, Réanalyses ERA5 | **Stations horaires terrestres (Météo-France)** | Données de capteurs instrumentaux homologués de l'OMM avec drapeaux de validation qualité (`Q_FF`, `Q_T`). |
 
 ---
 
