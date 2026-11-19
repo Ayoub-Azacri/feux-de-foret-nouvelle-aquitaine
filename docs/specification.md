@@ -67,7 +67,16 @@ Pour chaque donnée présente dans plusieurs sources :
 
 <!-- Section 5 : Attribuée à Omar HAKIK (Ticket #24 - Branche feature/spec-sources-omar) -->
 
-*Tableau des manques issus de docs/sources/matrice.md reliés aux décisions d'arbitrage (DEC-001 à DEC-006) et coûts analytiques.*
+Matrice complète : `docs/sources/matrice.md`
+
+| Question | Ce qui manque | Décision | Ce que la décision coûte | Journal |
+| :--- | :--- | :--- | :--- | :--- |
+| **Q1 (Massifs et communes)** | Coordonnées GPS précises du départ de feu | **Approximer** | Agrégation spatiale au niveau de la commune Insee, masquant les micro-hétérogénéités au sein d'une même commune. | DEC-001 |
+| **Q2 (Fiabilité vigilance)** | Absence d'archives Météo des forêts pour 2022 | **Approximer** | Reconstitution d'un seuil proxy météo physique (T > 35°C, vent > 30 km/h) pour évaluer la crise historique de 2022. | DEC-002 |
+| **Q3 (Modulation du seuil)** | Pas d'anémomètre sur la station de Belin-Béliet | **Approximer** | Substitution spatiale par la station voisine de Cazats (à 25 km), introduisant une tolérance d'erreur sur le vent local. | DEC-003 |
+| **Q4 (Départs sous vigilance faible)** | Donnée vigilance à la maille départementale uniforme | **Approximer** | Croisement avec les stations locales terrestres pour capter les anomalies de vent sec (> 30 km/h) et faible humidité (< 30%). | DEC-004 |
+| **Q5 (Surface moyenne par feu)** | Absence de l'heure d'extinction du feu dans BDIFF | **Renoncer** | Renoncement à calculer la vitesse d'expansion en ha/h ; recentrage sur la surface totale finale détruite par sinistre. | DEC-005 |
+| **Q6 (Ventilation horaire astreinte)** | Données de comptabilité analytique SDIS non publiques | **Approximer** | Utilisation d'un paramètre forfaitaire du coût d'une vacation horaire pour simuler le dimensionnement budgétaire. | DEC-006 |
 
 ---
 
