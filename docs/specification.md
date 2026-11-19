@@ -35,7 +35,16 @@ Questions écartées, avec la raison et le renvoi au journal :
 
 <!-- Section 3 : Attribuée à Omar HAKIK (Ticket #24 - Branche feature/spec-sources-omar) -->
 
-*Tableau des 4 sources retenues (avec lien vers les fiches d'identité, colonnes utiles, questions servies) et sources écartées.*
+| Source | Fiche | Localisation (URL, API, fichier) | Mode de récupération | Champs utiles | Questions servies |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **BDIFF (Incendies)** | `docs/sources/fiche-bdiff.md` | `bdiff.agriculture.gouv.fr` / CSV & WFS | Téléchargement CSV annuel & API WFS | `id_incendie`, `date_premiere_alerte`, `heure_alerte`, `code_insee`, `surface_totale_brulee_ha`, `nature_cause` | Q1, Q2, Q3, Q4, Q5, Q6 |
+| **Archives Météo des forêts** | `docs/sources/fiche-meteo-des-forets.md` | `data.gouv.fr` (Météo-France) | Téléchargement archive CSV compressée `.csv.gz` | `date`, `num_dep`, `niveau_j1`, `niveau_j2` | Q2, Q3, Q4, Q5 |
+| **BD Forêt V2 (IGN)** | `docs/sources/fiche-bd-foret-v2.md` | `geoservices.ign.fr` (Flux WFS / SHP) | Extraction SIG vectorielle GeoJSON | `code_tfv`, `essence`, `geom` (polygones pin maritime) | Q1, Q2, Q3 |
+| **Stations météo horaires** | `docs/sources/fiche-stations-horaires.md` | `meteo.data.gouv.fr` | Flux direct gzip par station | `NUM_POSTE`, `AAAAMMJJHH`, `T`, `FF`, `FXY`, `U`, `RR1`, `Q_FF`, `Q_T`, `Q_U` | Q1, Q2, Q3, Q4, Q5 |
+
+Sources écartées, avec la raison :
+* **Polygones bruts complets BD Forêt V2 Nouvelle-Aquitaine (> 200 Mo) :** Écartés pour respecter la gratuité et la légèreté du pipeline ; remplacés par un agrégat communal du taux de boisement en pin maritime (DEC-001).
+* **Stations météo amateurs non homologuées (Infoclimat / Netatmo) :** Écartées en raison de l'absence de certification métrologique et de drapeaux de qualité opposables au SDIS 33.
 
 ---
 
@@ -43,7 +52,14 @@ Questions écartées, avec la raison et le renvoi au journal :
 
 <!-- Section 4 : Attribuée à Omar HAKIK (Ticket #24 - Branche feature/spec-sources-omar) -->
 
-*Tableau de la source d'autorité unique par domaine partagé (incendies, météo prévisionnelle, végétation, mesures physiques).*
+Pour chaque donnée présente dans plusieurs sources :
+
+| Donnée | Sources concernées | Source de référence | Pourquoi |
+| :--- | :--- | :--- | :--- |
+| **Historique des incendies et surfaces** | BDIFF, Rapports internes SDIS | **BDIFF** | Base d'État consolidée par les DDTM et le SDIS, opposable et exhaustif sur 2006-2025. |
+| **Seuil d'alerte préventif** | Météo des forêts, Météo générale | **Archives Météo des forêts** | Seul indicateur officiel servant de déclencheur juridique aux arrêtés préfectoraux de restriction. |
+| **Combustible et couvert résineux** | BD Forêt V2, Corine Land Cover | **BD Forêt V2 (IGN)** | Référentiel national français le plus précis pour caractériser le pin maritime (résolution 0,5 ha). |
+| **Mesures physiques (vent, T°C, humidité)** | Stations horaires, Réanalyses ERA5 | **Stations horaires terrestres (Météo-France)** | Données de capteurs instrumentaux homologués de l'OMM avec drapeaux de validation qualité (`Q_FF`, `Q_T`). |
 
 ---
 
@@ -51,7 +67,16 @@ Questions écartées, avec la raison et le renvoi au journal :
 
 <!-- Section 5 : Attribuée à Omar HAKIK (Ticket #24 - Branche feature/spec-sources-omar) -->
 
-*Tableau des manques issus de docs/sources/matrice.md reliés aux décisions d'arbitrage (DEC-001 à DEC-006) et coûts analytiques.*
+Matrice complète : `docs/sources/matrice.md`
+
+| Question | Ce qui manque | Décision | Ce que la décision coûte | Journal |
+| :--- | :--- | :--- | :--- | :--- |
+| **Q1 (Massifs et communes)** | Coordonnées GPS précises du départ de feu | **Approximer** | Agrégation spatiale au niveau de la commune Insee, masquant les micro-hétérogénéités au sein d'une même commune. | DEC-001 |
+| **Q2 (Fiabilité vigilance)** | Absence d'archives Météo des forêts pour 2022 | **Approximer** | Reconstitution d'un seuil proxy météo physique (T > 35°C, vent > 30 km/h) pour évaluer la crise historique de 2022. | DEC-002 |
+| **Q3 (Modulation du seuil)** | Pas d'anémomètre sur la station de Belin-Béliet | **Approximer** | Substitution spatiale par la station voisine de Cazats (à 25 km), introduisant une tolérance d'erreur sur le vent local. | DEC-003 |
+| **Q4 (Départs sous vigilance faible)** | Donnée vigilance à la maille départementale uniforme | **Approximer** | Croisement avec les stations locales terrestres pour capter les anomalies de vent sec (> 30 km/h) et faible humidité (< 30%). | DEC-004 |
+| **Q5 (Surface moyenne par feu)** | Absence de l'heure d'extinction du feu dans BDIFF | **Renoncer** | Renoncement à calculer la vitesse d'expansion en ha/h ; recentrage sur la surface totale finale détruite par sinistre. | DEC-005 |
+| **Q6 (Ventilation horaire astreinte)** | Données de comptabilité analytique SDIS non publiques | **Approximer** | Utilisation d'un paramètre forfaitaire du coût d'une vacation horaire pour simuler le dimensionnement budgétaire. | DEC-006 |
 
 ---
 
@@ -59,7 +84,16 @@ Questions écartées, avec la raison et le renvoi au journal :
 
 <!-- Section 6 : Attribuée à Omar HAKIK (Ticket #24 - Branche feature/spec-sources-omar) -->
 
-*Tableau des incohérences réelles de format (dates, codes spatiaux, unités de vent) et transformations prévues.*
+| Sources | Nature (format de date, unité, recouvrement, clé) | Exemple tiré du fichier | Transformation nécessaire |
+| :--- | :--- | :--- | :--- |
+| **BDIFF vs Météo des forêts vs Stations** | **Hétérogénéité des horodatages** | BDIFF : `02/03/2022 08:00` (heure locale)<br>Météo forêts : `2024-06-03T00:00:00Z` (ISO UTC)<br>Stations : `2022071214` (entier UTC) | Normalisation complète en horodatage standardisé ISO 8601 UTC (`YYYY-MM-DDTHH:MM:SSZ`) avec gestion du décalage saisonnier (+2h l'été). |
+| **BDIFF vs Stations horaires** | **Alignement des clés spatiales (Insee vs GPS)** | BDIFF indexée par code commune Insee (`33248`) ; Stations indexées par identifiant poste (`NUM_POSTE = 33042001`) avec coordonnées géographiques | Création d'une table de passage spatiale reliant chaque commune de Gironde à la station météo homologuée la plus proche via calcul de distance géodésique. |
+| **BD Forêt V2 vs BDIFF** | **Projections SIG et maillages incompatibles** | BD Forêt en polygones vectoriels Lambert-93 (EPSG:2154) sans code Insee ; BDIFF en code Insee | Jointure spatiale SIG (intersection géographique) pour calculer le taux de couverture en pin maritime par commune Insee. |
+| **Stations horaires** | **Unités physiques non standardisées métier** | Vitesse du vent brute exprimée en m/s (`FF = 8.5`) | Conversion systématique en kilomètres par heure (`km/h = m/s * 3.6`) pour correspondre aux doctrines opérationnelles du SDIS 33. |
+
+### Données concurrentes et arbitrage des doublons
+* **En cas de doublon sur un même feu :** Si un incendie fait l'objet de plusieurs déclarations communales lors d'un franchissement de frontière communale, l'enregistrement conservé est celui portant le plus grand cumul de surface détruite (`surface_totale_brulee_ha`), rattaché à la commune du départ initial.
+* **En cas de contradiction sur la météo :** La mesure de la station terrestre de référence Météo-France prime systématiquement sur toute interpolation ou modèle prédictif dès lors que son drapeau qualité est valide (`Q_FF = 1` et `Q_T = 1`).
 
 ---
 
