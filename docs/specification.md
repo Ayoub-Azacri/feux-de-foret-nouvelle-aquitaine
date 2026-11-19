@@ -84,7 +84,16 @@ Matrice complète : `docs/sources/matrice.md`
 
 <!-- Section 6 : Attribuée à Omar HAKIK (Ticket #24 - Branche feature/spec-sources-omar) -->
 
-*Tableau des incohérences réelles de format (dates, codes spatiaux, unités de vent) et transformations prévues.*
+| Sources | Nature (format de date, unité, recouvrement, clé) | Exemple tiré du fichier | Transformation nécessaire |
+| :--- | :--- | :--- | :--- |
+| **BDIFF vs Météo des forêts vs Stations** | **Hétérogénéité des horodatages** | BDIFF : `02/03/2022 08:00` (heure locale)<br>Météo forêts : `2024-06-03T00:00:00Z` (ISO UTC)<br>Stations : `2022071214` (entier UTC) | Normalisation complète en horodatage standardisé ISO 8601 UTC (`YYYY-MM-DDTHH:MM:SSZ`) avec gestion du décalage saisonnier (+2h l'été). |
+| **BDIFF vs Stations horaires** | **Alignement des clés spatiales (Insee vs GPS)** | BDIFF indexée par code commune Insee (`33248`) ; Stations indexées par identifiant poste (`NUM_POSTE = 33042001`) avec coordonnées géographiques | Création d'une table de passage spatiale reliant chaque commune de Gironde à la station météo homologuée la plus proche via calcul de distance géodésique. |
+| **BD Forêt V2 vs BDIFF** | **Projections SIG et maillages incompatibles** | BD Forêt en polygones vectoriels Lambert-93 (EPSG:2154) sans code Insee ; BDIFF en code Insee | Jointure spatiale SIG (intersection géographique) pour calculer le taux de couverture en pin maritime par commune Insee. |
+| **Stations horaires** | **Unités physiques non standardisées métier** | Vitesse du vent brute exprimée en m/s (`FF = 8.5`) | Conversion systématique en kilomètres par heure (`km/h = m/s * 3.6`) pour correspondre aux doctrines opérationnelles du SDIS 33. |
+
+### Données concurrentes et arbitrage des doublons
+* **En cas de doublon sur un même feu :** Si un incendie fait l'objet de plusieurs déclarations communales lors d'un franchissement de frontière communale, l'enregistrement conservé est celui portant le plus grand cumul de surface détruite (`surface_totale_brulee_ha`), rattaché à la commune du départ initial.
+* **En cas de contradiction sur la météo :** La mesure de la station terrestre de référence Météo-France prime systématiquement sur toute interpolation ou modèle prédictif dès lors que son drapeau qualité est valide (`Q_FF = 1` et `Q_T = 1`).
 
 ---
 
