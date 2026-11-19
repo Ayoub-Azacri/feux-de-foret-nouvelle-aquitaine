@@ -35,7 +35,16 @@ Questions écartées, avec la raison et le renvoi au journal :
 
 <!-- Section 3 : Attribuée à Omar HAKIK (Ticket #24 - Branche feature/spec-sources-omar) -->
 
-*Tableau des 4 sources retenues (avec lien vers les fiches d'identité, colonnes utiles, questions servies) et sources écartées.*
+| Source | Fiche | Localisation (URL, API, fichier) | Mode de récupération | Champs utiles | Questions servies |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **BDIFF (Incendies)** | `docs/sources/fiche-bdiff.md` | `bdiff.agriculture.gouv.fr` / CSV & WFS | Téléchargement CSV annuel & API WFS | `id_incendie`, `date_premiere_alerte`, `heure_alerte`, `code_insee`, `surface_totale_brulee_ha`, `nature_cause` | Q1, Q2, Q3, Q4, Q5, Q6 |
+| **Archives Météo des forêts** | `docs/sources/fiche-meteo-des-forets.md` | `data.gouv.fr` (Météo-France) | Téléchargement archive CSV compressée `.csv.gz` | `date`, `num_dep`, `niveau_j1`, `niveau_j2` | Q2, Q3, Q4, Q5 |
+| **BD Forêt V2 (IGN)** | `docs/sources/fiche-bd-foret-v2.md` | `geoservices.ign.fr` (Flux WFS / SHP) | Extraction SIG vectorielle GeoJSON | `code_tfv`, `essence`, `geom` (polygones pin maritime) | Q1, Q2, Q3 |
+| **Stations météo horaires** | `docs/sources/fiche-stations-horaires.md` | `meteo.data.gouv.fr` | Flux direct gzip par station | `NUM_POSTE`, `AAAAMMJJHH`, `T`, `FF`, `FXY`, `U`, `RR1`, `Q_FF`, `Q_T`, `Q_U` | Q1, Q2, Q3, Q4, Q5 |
+
+Sources écartées, avec la raison :
+* **Polygones bruts complets BD Forêt V2 Nouvelle-Aquitaine (> 200 Mo) :** Écartés pour respecter la gratuité et la légèreté du pipeline ; remplacés par un agrégat communal du taux de boisement en pin maritime (DEC-001).
+* **Stations météo amateurs non homologuées (Infoclimat / Netatmo) :** Écartées en raison de l'absence de certification métrologique et de drapeaux de qualité opposables au SDIS 33.
 
 ---
 
