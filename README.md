@@ -105,3 +105,21 @@ Tableau de bord Streamlit ◄─── Prêtes pour analyse (Gold) ◄─── 
 4. **Données consolidées (Silver 2 / Warehouse) :** Modèle dimensionnel en étoile sous moteur **DuckDB** (`feux_foret.duckdb`) croisant feux, météo et combustible végétal au grain communal Insee et horaire.
 5. **Données prêtes pour l'analyse (Gold) :** Vues SQL matérialisant les matrices de confusion de la Météo des forêts et les profils micro-climatiques.
 6. **Restitution :** Application interactive Streamlit permettant aux officiers du SDIS 33 de simuler l'impact des seuils d'alerte et d'optimiser le pré-positionnement des moyens de secours.
+
+---
+
+## 6. Citations des sources, licences et droits de reproduction
+
+L'ensemble des données mobilisées dans ce projet d'aide à la décision pour le SDIS 33 est documenté avec leurs licences respectives et respecte une séparation stricte entre données brutes et données dérivées :
+
+* **Base de Données sur les Incendies de Forêts en France (BDIFF) :** Produite par l'IGN et le Ministère de l'Agriculture et de la Souveraineté alimentaire. Données ouvertes sous Licence Ouverte v2.0 (Etalab).
+* **Archives de la Météo des forêts (2024–2026) :** Produite par Météo-France. Données ouvertes sous Licence Ouverte v2.0 (Etalab).
+* **Données climatologiques horaires des 31 stations de Gironde (2022–2026) :** Produite par Météo-France via la plateforme meteo.data.gouv.fr. Données publiques Météo-France.
+* **BD Forêt V2 :** Produite par l'IGN (Institut national de l'information géographique et forestière). Données ouvertes sous Licence Ouverte v2.0 (Etalab).
+
+### Mentions légales et données dérivées
+
+1. **Cadre d'usage académique et non commercial :** Ce projet est réalisé à des fins d'ingénierie et de recherche appliquée pour le commandement opérationnel du SDIS 33 dans le cadre du Titre RNCP 36209 Niveau 7 (HETIC Master MD5). Les données ne sont ni vendues, ni louées, ni soumises à redevance, et excluent toute finalité commerciale ou publicitaire.
+2. **Statut de données dérivées :** Les tables nettoyées, les modèles analytiques sous DuckDB et les tableaux de bord de restitution sont présentés comme des **données dérivées réalisées à partir des sources officielles**, et non comme les données des sources elles-mêmes.
+3. **Respect de l'intégrité et droits réservés :** La couche Bronze (`data/raw/`) préserve l'intégrité intégrale des données sources sans altération. Les droits de reproduction et de diffusion des données sources demeurent réservés et strictement limités à leurs producteurs officiels.
+Pour le détail technique de chaque source et des consignes d'ingestion, se référer au guide [data/README.md](data/README.md).
