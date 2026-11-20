@@ -219,6 +219,13 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# Data directory (raw and processed datasets)
-data/
+# Data directory (raw and processed datasets excluded from Git, except README)
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+
+# Local DuckDB database files
+*.duckdb
+*.duckdb.wal
 
